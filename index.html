@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Jampier | Software Engineer & Backend Developer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        darkBg: '#050505', darkCard: '#111111', primary: '#3fb950', accent: '#00D4FF'
+                    },
+                    animation: { 'fadeIn': 'fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards' },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(15px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { background-color: #050505; color: #a1a1aa; overflow-x: hidden; }
+        .text-gradient {
+            background: linear-gradient(135deg, #3fb950 0%, #00D4FF 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        #cursor-glow {
+            position: absolute; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(63,185,80,0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: -1;
+            transition: top 0.1s ease-out, left 0.1s ease-out;
+        }
+        @media (max-width: 768px) { #cursor-glow { display: none; } }
+        
+        .cursor-blink::after { content: '|'; animation: blink 1s step-end infinite; color: #3fb950; }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .page-view.hidden { display: none; }
+
+        /* Estilos del blog */
+        .blog-content h3 { color: #ffffff; font-size: 1.5rem; font-weight: bold; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content p { margin-bottom: 1.25rem; line-height: 1.8; }
+        .blog-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+        .blog-content li { margin-bottom: 0.5rem; }
+        .blog-content strong { color: #ffffff; }
+        .blog-content pre { background-color: #111111; border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.5rem; color: #3fb950;}
+    </style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-white relative min-h-screen flex flex-col">
+
+    <div id="cursor-glow"></div>
+
+    <!-- NAVEGACIÓN PC (Z-INDEX 50) -->
+    <nav class="fixed w-full z-50 bg-darkBg/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <a href="#" onclick="navigate('view-home')" class="font-heading font-bold text-2xl text-white tracking-tighter">
+                Edu<span class="text-primary">Jamp</span>.
+            </a>
+            
+            <!-- Botón para ABRIR menú móvil -->
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden text-white text-2xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Enlaces Desktop -->
+            <div class="hidden md:flex space-x-8 font-medium text-sm">
+                <button onclick="navigate('view-home')" class="nav-btn text-primary hover:text-white transition">Inicio</button>
+                <button onclick="navigate('view-profile')" class="nav-btn text-gray-400 hover:text-white transition">Perfil</button>
+                <button onclick="navigate('view-projects')" class="nav-btn text-gray-400 hover:text-white transition">Proyectos</button>
+                <button onclick="navigate('view-blog')" class="nav-btn text-gray-400 hover:text-white transition">Blog</button>
+                <button onclick="navigate('view-contact')" class="nav-btn text-gray-400 hover:text-white transition">Contacto</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MENÚ MÓVIL AISLADO (Z-INDEX 60, FONDO SÓLIDO FORZADO) -->
+    <!-- Solución al error: Ahora está completamente fuera de la etiqueta <nav> -->
+    <div id="mobile-menu" class="md:hidden fixed inset-0 flex flex-col items-center justify-center space-y-6 font-heading text-2xl font-bold opacity-0 pointer-events-none transition-opacity duration-300 z-[60] overflow-y-auto" style="background-color: #050505;">
+        
+        <!-- Botón para CERRAR menú móvil -->
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-white text-3xl focus:outline-none p-2">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <button onclick="navigate('view-home'); toggleMobileMenu()" class="text-white hover:text-primary transition w-full py-2">Inicio</button>
+        <button onclick="navigate('view-profile'); toggleMobileMenu()" class="text-white hover:text-primary transition w-full py-2">Perfil</button>
+        <button onclick="navigate('view-projects'); toggleMobileMenu()" class="text-white hover:text-primary transition w-full py-2">Proyectos</button>
+        <button onclick="navigate('view-blog'); toggleMobileMenu()" class="text-white hover:text-primary transition w-full py-2">Blog</button>
+        <button onclick="navigate('view-contact'); toggleMobileMenu()" class="text-white hover:text-primary transition w-full py-2">Contacto</button>
+        
+        <div class="flex gap-8 mt-8 text-gray-400">
+            <a href="https://github.com/EduJamp" target="_blank" class="p-2 hover:text-white transition"><i class="fa-brands fa-github text-4xl"></i></a>
+            <a href="https://linkedin.com/in/edujampier" target="_blank" class="p-2 hover:text-[#0A66C2] transition"><i class="fa-brands fa-linkedin text-4xl"></i></a>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DE VISTAS -->
+    <main class="flex-grow pt-20">
+
+        <!-- VISTA 1: INICIO -->
+        <section id="view-home" class="page-view animate-fadeIn min-h-[85vh] flex items-center justify-center px-4 sm:px-6 relative overflow-hidden py-10 md:py-0">
+            <div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center text-center md:text-left">
+                
+                <div class="order-1 md:order-2 relative flex justify-center reveal">
+                    <div class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[420px] md:h-[420px]">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-primary to-accent rounded-full blur-2xl md:blur-3xl opacity-20 animate-pulse"></div>
+                        <img src="perfil.jpeg" alt="Edu Jampier" class="relative w-full h-full object-cover rounded-full border-2 border-white/10 shadow-2xl z-10 transition duration-500 hover:scale-[1.02]">
+                    </div>
+                </div>
+
+                <div class="order-2 md:order-1 reveal">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 mb-6">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span></span>
+                        <span class="text-xs md:text-sm font-medium text-primary">Disponible para nuevos retos</span>
+                    </div>
+                    <h1 class="font-heading text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-2 md:mb-4 leading-tight tracking-tight">
+                        Edu <span class="text-white">Jampier.</span>
+                    </h1>
+                    <h2 class="font-heading text-xl sm:text-2xl md:text-3xl font-bold mb-6 h-8 md:h-10 text-gradient cursor-blink" id="typed-text"></h2>
+                    
+                    <p class="text-base md:text-lg text-gray-400 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed">
+                        Ingeniero de Software enfocado en el desarrollo Backend y Full Stack. Transformo la complejidad de los requerimientos de negocio en <strong>arquitecturas escalables, APIs de alto rendimiento y código limpio</strong>.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                        <button onclick="navigate('view-projects')" class="px-6 md:px-8 py-3 md:py-4 bg-primary text-white rounded-lg hover:bg-green-600 transition shadow-[0_0_20px_rgba(63,185,80,0.4)] font-semibold w-full sm:w-auto">
+                            Explorar Portafolio
+                        </button>
+                        <a href="CV.pdf" target="_blank" class="px-6 md:px-8 py-3 md:py-4 bg-darkCard border border-white/10 text-white rounded-lg hover:border-white/30 transition font-semibold w-full sm:w-auto text-center flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Descargar CV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- VISTA 2: PERFIL -->
+        <section id="view-profile" class="page-view hidden px-4 sm:px-6 py-12 md:py-20">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-heading text-3xl md:text-5xl font-bold text-white mb-4">Mi <span class="text-gradient">ADN Tecnológico</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-base">Construyendo el futuro digital a través de bases sólidas y metodologías ágiles.</p>
+                </div>
+
+                <div class="bg-darkCard/50 border border-white/5 rounded-3xl p-6 md:p-12 mb-16 reveal flex flex-col md:flex-row gap-10 items-center">
+                    <div class="flex-1">
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Ingeniería y Arquitectura de Software</h3>
+                        <p class="mb-4 text-gray-400 leading-relaxed text-sm md:text-base">
+                            Como estudiante del 7.º ciclo de Ingeniería de Sistemas e Informática en la UTP, poseo una base teórica inquebrantable que complemento con práctica constante. Domino el ecosistema <strong class="text-white">Java, Spring Boot y Angular</strong>, asegurando que el frontend y el backend se comuniquen con máxima eficiencia.
+                        </p>
+                        
+                        <div class="p-5 bg-primary/5 border border-primary/20 rounded-xl mt-6 relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 text-primary/10 text-9xl"><i class="fa-solid fa-sitemap"></i></div>
+                            <p class="text-gray-300 leading-relaxed text-sm md:text-base relative z-10">
+                                <strong class="text-primary block mb-2"><i class="fa-solid fa-laptop-code mr-2"></i>Pasión por la Arquitectura Sólida:</strong>
+                                Me rehúso a escribir código sin planificación. Aseguro la calidad de mis entregables aplicando ingeniería de software desde la fase cero: diseño <strong>diagramas de bases de datos relacionales/NoSQL, flujos de procesos, diagramas de clases, despliegue, casos de uso y notación BPMN</strong>. Esta mentalidad me permite identificar cuellos de botella antes de que existan y garantizar plataformas 100% escalables.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-heading text-2xl md:text-3xl font-bold text-white mb-10 reveal text-center md:text-left">
+                    <i class="fa-solid fa-briefcase text-primary mr-3"></i> Trayectoria Profesional
+                </h3>
+                
+                <div class="relative border-l-2 border-white/10 ml-2 md:ml-4 pl-6 md:pl-10 mb-16 reveal">
+                    <div class="absolute w-4 h-4 md:w-5 md:h-5 bg-darkBg border-2 md:border-4 border-primary rounded-full -left-[9px] md:-left-[11px] top-1"></div>
+                    <span class="text-primary font-mono text-xs md:text-sm tracking-widest font-semibold block mb-2">2023 - ACTUALIDAD</span>
+                    <h4 class="text-xl md:text-2xl font-bold text-white mb-1">Ingeniero / Desarrollador Freelance (Full Stack)</h4>
+                    <p class="text-accent text-sm md:text-base font-medium mb-4">Servicios B2B & Particulares | Chimbote, Perú</p>
+                    <p class="text-gray-400 mb-6 max-w-3xl leading-relaxed text-sm md:text-base">
+                        Gestión completa (End-to-End) del ciclo de vida del software. Traduzco modelos de negocio complejos en soluciones técnicas eficientes, asegurando tiempos de carga rápidos, seguridad de datos y una experiencia de usuario impecable.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+                        <p><i class="fa-solid fa-check text-primary mr-2"></i> Levantamiento y análisis de requerimientos.</p>
+                        <p><i class="fa-solid fa-check text-primary mr-2"></i> Diseño e implementación de APIs RESTful.</p>
+                        <p><i class="fa-solid fa-check text-primary mr-2"></i> Gestión de Bases de Datos SQL y NoSQL.</p>
+                        <p><i class="fa-solid fa-check text-primary mr-2"></i> Integración de Patrones de Diseño (POO).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- VISTA 3: PROYECTOS -->
+        <section id="view-projects" class="page-view hidden px-4 sm:px-6 py-12 md:py-20">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-heading text-3xl md:text-5xl font-bold text-white mb-4">Portafolio de <span class="text-gradient">Proyectos</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-base">Un vistazo a los ecosistemas que he construido.</p>
+                </div>
+
+                <div class="flex flex-col gap-12 md:gap-16">
+                    <!-- Proyecto 1 -->
+                    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center bg-darkCard/30 p-6 md:p-10 rounded-3xl border border-white/5 reveal w-full">
+                        <div class="w-full lg:w-5/12 aspect-[4/3] lg:aspect-square xl:aspect-[4/3] bg-gradient-to-br from-gray-900 to-black rounded-2xl flex items-center justify-center border border-white/10 relative group overflow-hidden shrink-0">
+                            <i class="fa-solid fa-book-open-reader text-6xl md:text-7xl text-gray-700 group-hover:scale-110 group-hover:text-primary transition duration-500 relative z-10"></i>
+                            <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        </div>
+                        <div class="w-full lg:w-7/12 flex flex-col justify-center">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-3 py-1 bg-white/5 text-primary rounded-full text-xs font-bold tracking-wide">SPRING BOOT</span>
+                                <span class="px-3 py-1 bg-white/5 text-accent rounded-full text-xs font-bold tracking-wide">ANGULAR</span>
+                            </div>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">App Lectora de Manhwas</h3>
+                            <p class="text-gray-400 mb-6 leading-relaxed text-sm md:text-base">
+                                Sistema integral desarrollado para el consumo eficiente de mangas y manhwas. Se integra de manera síncrona con la <strong>API de MangaDex</strong> para indexar títulos, gestionar catálogos y renderizar imágenes de capítulos en un visor optimizado para web.
+                            </p>
+                            <a href="https://github.com/EduJamp" target="_blank" class="w-full sm:w-fit inline-flex items-center justify-center px-6 py-3 bg-white/5 border border-white/10 hover:border-primary text-white hover:bg-primary rounded-lg transition duration-300 font-semibold">
+                                <i class="fa-brands fa-github mr-2"></i> Ver Código Fuente
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Proyecto 2 -->
+                    <div class="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-center bg-darkCard/30 p-6 md:p-10 rounded-3xl border border-white/5 reveal w-full">
+                        <div class="w-full lg:w-5/12 aspect-[4/3] lg:aspect-square xl:aspect-[4/3] bg-gradient-to-br from-gray-900 to-black rounded-2xl flex items-center justify-center border border-white/10 relative group overflow-hidden shrink-0">
+                            <i class="fa-solid fa-chart-line text-6xl md:text-7xl text-gray-700 group-hover:scale-110 group-hover:text-accent transition duration-500 relative z-10"></i>
+                            <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        </div>
+                        <div class="w-full lg:w-7/12 flex flex-col justify-center">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-3 py-1 bg-white/5 text-primary rounded-full text-xs font-bold tracking-wide">ERP B2B</span>
+                                <span class="px-3 py-1 bg-white/5 text-gray-300 rounded-full text-xs font-bold tracking-wide">POSTGRESQL</span>
+                            </div>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Sistema de Gestión (LiamyImport)</h3>
+                            <p class="text-gray-400 mb-6 leading-relaxed text-sm md:text-base">
+                                Plataforma empresarial para la administración centralizada de inventarios y procesos de ventas. Implementa autenticación segura, control de permisos basados en roles (Admin/User) y trazabilidad completa de transacciones comerciales.
+                            </p>
+                            <a href="https://github.com/EduJamp" target="_blank" class="w-full sm:w-fit inline-flex items-center justify-center px-6 py-3 bg-white/5 border border-white/10 hover:border-primary text-white hover:bg-primary rounded-lg transition duration-300 font-semibold">
+                                <i class="fa-brands fa-github mr-2"></i> Ver Repositorio
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Proyecto 3 -->
+                    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center bg-darkCard/30 p-6 md:p-10 rounded-3xl border border-white/5 reveal w-full">
+                        <div class="w-full lg:w-5/12 aspect-[4/3] lg:aspect-square xl:aspect-[4/3] bg-gradient-to-br from-gray-900 to-black rounded-2xl flex items-center justify-center border border-white/10 relative group overflow-hidden shrink-0">
+                            <i class="fa-solid fa-water text-6xl md:text-7xl text-gray-700 group-hover:scale-110 group-hover:text-primary transition duration-500 relative z-10"></i>
+                            <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        </div>
+                        <div class="w-full lg:w-7/12 flex flex-col justify-center">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-3 py-1 bg-white/5 text-primary rounded-full text-xs font-bold tracking-wide">IoT / HARDWARE</span>
+                                <span class="px-3 py-1 bg-white/5 text-accent rounded-full text-xs font-bold tracking-wide">PYTHON ML</span>
+                            </div>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Monitoreo Oceánico Inteligente</h3>
+                            <p class="text-gray-400 mb-6 leading-relaxed text-sm md:text-base">
+                                Boya marítima automatizada programada con MicroPython (ESP32) para la captura de variables ambientales. Los datos son procesados mediante Machine Learning en Python y almacenados en un backend para su análisis preventivo.
+                            </p>
+                            <a href="https://github.com/EduJamp" target="_blank" class="w-full sm:w-fit inline-flex items-center justify-center px-6 py-3 bg-white/5 border border-white/10 hover:border-primary text-white hover:bg-primary rounded-lg transition duration-300 font-semibold">
+                                <i class="fa-brands fa-github mr-2"></i> Ver Documentación
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- VISTA 4: BLOG -->
+        <section id="view-blog" class="page-view hidden px-4 sm:px-6 py-12 md:py-20">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-heading text-3xl md:text-5xl font-bold text-white mb-4">Blog <span class="text-gradient">Técnico</span></h2>
+                    <p class="text-gray-400 max-w-lg mx-auto text-sm md:text-base">Guías, buenas prácticas y lecciones aprendidas en el desarrollo de software.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tarjeta Artículo 1 -->
+                    <article onclick="openArticle('spring-boot')" class="bg-darkCard border border-white/5 rounded-2xl overflow-hidden hover:-translate-y-2 hover:border-primary/50 transition duration-300 reveal cursor-pointer flex flex-col group">
+                        <div class="h-48 bg-gray-900 border-b border-white/5 flex items-center justify-center relative overflow-hidden">
+                            <i class="fa-solid fa-leaf text-6xl text-gray-700 group-hover:text-primary transition duration-500 group-hover:scale-110"></i>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-3">Arquitectura Limpia en Spring Boot: ¿Por dónde empezar?</h3>
+                                <p class="text-gray-400 text-sm mb-4 line-clamp-3">Aprende a estructurar tus paquetes y responsabilidades en Java para evitar el código espagueti y construir APIs escalables.</p>
+                            </div>
+                            <span class="text-primary text-sm font-semibold mt-4 block">Leer artículo <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        </div>
+                    </article>
+
+                    <!-- Tarjeta Artículo 2 -->
+                    <article onclick="openArticle('angular-api')" class="bg-darkCard border border-white/5 rounded-2xl overflow-hidden hover:-translate-y-2 hover:border-accent/50 transition duration-300 reveal cursor-pointer flex flex-col group">
+                        <div class="h-48 bg-gray-900 border-b border-white/5 flex items-center justify-center relative overflow-hidden">
+                            <i class="fa-solid fa-plug text-6xl text-gray-700 group-hover:text-accent transition duration-500 group-hover:scale-110"></i>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-3">Consumiendo APIs Externas con Angular de forma profesional</h3>
+                                <p class="text-gray-400 text-sm mb-4 line-clamp-3">Manejo de Observables, Tipado Estricto con TypeScript e Interceptores HTTP basado en el caso de uso de MangaDex.</p>
+                            </div>
+                            <span class="text-accent text-sm font-semibold mt-4 block">Leer artículo <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 4.1: ARTÍCULO DINÁMICO -->
+        <section id="view-article" class="page-view hidden px-4 sm:px-6 py-12 md:py-20 min-h-[75vh]">
+            <div class="max-w-3xl mx-auto reveal active">
+                <button onclick="navigate('view-blog')" class="text-primary hover:text-white mb-8 transition font-semibold flex items-center">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Volver al listado
+                </button>
+                <h2 id="article-title" class="font-heading text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">Título</h2>
+                <div class="flex items-center gap-4 mb-8 text-sm text-gray-400 border-b border-white/10 pb-6">
+                    <img src="perfil.jpeg" class="w-12 h-12 rounded-full border border-white/20" alt="Edu">
+                    <div>
+                        <p class="text-white font-semibold text-base">Edu Jampier</p>
+                        <p id="article-meta">Fecha • Tiempo de lectura</p>
+                    </div>
+                </div>
+                <div id="article-content" class="blog-content text-gray-300 text-base md:text-lg"></div>
+            </div>
+        </section>
+
+
+        <!-- VISTA 5: CONTACTO -->
+        <section id="view-contact" class="page-view hidden px-4 sm:px-6 py-12 md:py-20 min-h-[80vh] flex items-center">
+            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+                <div class="reveal">
+                    <h2 class="font-heading text-4xl md:text-6xl font-bold text-white mb-6">Conectemos.</h2>
+                    <p class="text-base md:text-lg text-gray-400 mb-10 leading-relaxed">
+                        Estoy preparado para sumarme a un equipo dinámico como <strong>Desarrollador Junior Backend o Full Stack</strong>. Si buscas un perfil estructurado, metódico y apasionado por resolver problemas técnicos, estás en el lugar correcto.
+                    </p>
+                    
+                    <div class="space-y-4 md:space-y-6">
+                        <a href="mailto:educaceresruiz@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-darkCard border border-white/5 hover:border-primary transition group">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition">
+                                <i class="fa-solid fa-envelope text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm text-gray-500">Correo Electrónico</p>
+                                <p class="text-white text-sm md:text-base font-semibold">educaceresruiz@gmail.com</p>
+                            </div>
+                        </a>
+                        
+                        <a href="https://linkedin.com/in/edujampier" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-darkCard border border-white/5 hover:border-[#0A66C2] transition group">
+                            <div class="w-12 h-12 rounded-full bg-[#0A66C2]/10 flex items-center justify-center text-[#0A66C2] group-hover:bg-[#0A66C2] group-hover:text-white transition">
+                                <i class="fa-brands fa-linkedin-in text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm text-gray-500">LinkedIn</p>
+                                <p class="text-white text-sm md:text-base font-semibold">/in/edujampier</p>
+                            </div>
+                        </a>
+
+                        <a href="https://github.com/EduJamp" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-darkCard border border-white/5 hover:border-white transition group">
+                            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition">
+                                <i class="fa-brands fa-github text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs md:text-sm text-gray-500">Repositorio GitHub</p>
+                                <p class="text-white text-sm md:text-base font-semibold">github.com/EduJamp</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bg-darkCard border border-white/10 p-6 md:p-10 rounded-3xl reveal relative overflow-hidden">
+                    <h3 class="text-2xl font-bold text-white mb-8 relative z-10">Envíame un mensaje</h3>
+                    <form class="space-y-5 relative z-10" onsubmit="event.preventDefault(); alert('¡Gracias por probar el formulario! Por el momento, usa mi correo electrónico o LinkedIn para contactarme de forma directa.');">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <input type="text" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Nombre completo" required>
+                            <input type="email" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Correo electrónico" required>
+                        </div>
+                        <input type="text" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Asunto (Ej. Oferta Laboral, Proyecto)" required>
+                        <textarea rows="5" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm resize-none transition" placeholder="Cuéntame sobre el proyecto o la vacante..." required></textarea>
+                        <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-lg hover:bg-primary hover:text-white transition duration-300">
+                            Enviar Mensaje <i class="fa-solid fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/5 bg-darkBg py-8 text-center mt-auto z-10 relative">
+        <p class="text-gray-500 text-sm font-medium tracking-wide">
+            DISEÑADO & DESARROLLADO POR EDU JAMPIER <br> &copy; 2026 TODOS LOS DERECHOS RESERVADOS.
+        </p>
+    </footer>
+
+    <!-- SCRIPT CORE -->
+    <script>
+        const blogData = {
+            'spring-boot': {
+                title: 'Arquitectura Limpia en Spring Boot: ¿Por dónde empezar?',
+                meta: 'Octubre 2026 • 5 min de lectura',
+                content: `
+                    <p>Cuando construimos aplicaciones de nivel empresarial, el mayor enemigo del desarrollador a largo plazo es el "código espagueti". Como desarrollador Backend, he aprendido que el framework <strong>Spring Boot</strong> es sumamente poderoso, pero si no se estructura correctamente desde el día 1, el mantenimiento se vuelve una pesadilla.</p>
+                    
+                    <h3>La Separación de Responsabilidades (SoC)</h3>
+                    <p>El principio fundamental para una arquitectura sólida es separar qué hace cada parte del código. En el ecosistema de Java, esto se logra dividiendo nuestro proyecto en capas claras y estrictas:</p>
+                    <ul>
+                        <li><strong>Capa de Controladores (Controllers):</strong> Su única función es recibir la petición HTTP, validar los parámetros básicos (DTOs) y delegar el trabajo pesado. <span class="text-gray-500 italic">Nunca debe contener lógica de negocio.</span></li>
+                        <li><strong>Capa de Servicios (Services):</strong> Es el corazón de tu aplicación. Aquí residen los casos de uso, las reglas de negocio y los cálculos.</li>
+                        <li><strong>Capa de Repositorio (Repositories):</strong> Exclusiva para la persistencia. Se encarga de hablar con la base de datos (Ej. mediante Spring Data JPA).</li>
+                    </ul>
+
+                    <h3>Inyección de Dependencias (@Autowired vs Constructor)</h3>
+                    <p>Aunque la anotación <code>@Autowired</code> directamente en las propiedades es muy popular, la mejor práctica actual (y la que yo aplico en mis desarrollos) es la <strong>inyección a través del constructor</strong>. Esto facilita el testing (Mocking) y asegura que nuestras clases no puedan ser instanciadas sin sus dependencias obligatorias.</p>
+                    
+                    <pre><code>@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    // Inyección por constructor recomendada
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}</code></pre>
+
+                    <h3>Conclusión</h3>
+                    <p>Establecer esta arquitectura antes de escribir la lógica y apoyarnos en diagramas UML garantiza que cuando nuestro sistema escale a cientos de entidades, sepamos exactamente dónde encontrar cada pieza de código.</p>
+                `
+            },
+            'angular-api': {
+                title: 'Consumiendo APIs Externas con Angular de forma Profesional',
+                meta: 'Septiembre 2026 • 6 min de lectura',
+                content: `
+                    <p>Integrar un frontend con servicios externos siempre representa un desafío técnico. Durante el desarrollo de la App de Manhwas integrada con la API de MangaDex, tuve que aplicar conceptos avanzados de Angular para asegurar que la plataforma fuera rápida y resiliente.</p>
+
+                    <h3>1. Tipado Estricto con Interfaces de TypeScript</h3>
+                    <p>Lo peor que puedes hacer al consumir una API es trabajar con datos de tipo <code>any</code>. Para mantener la seguridad y el autocompletado en todo el proyecto, es obligatorio mapear la respuesta JSON del servidor mediante Interfaces.</p>
+                    <pre><code>export interface MangaResponse {
+    data: MangaData[];
+    limit: number;
+    offset: number;
+    total: number;
+}</code></pre>
+
+                    <h3>2. El poder de RxJS y los Observables</h3>
+                    <p>A diferencia de las Promesas convencionales, Angular utiliza Observables (RxJS) en su <code>HttpClient</code>. Esto nos permite cancelar peticiones en vuelo, reintentarlas en caso de fallo (<code>retry(3)</code>) o transformar los datos en el camino usando <code>pipe</code> y <code>map</code> antes de que lleguen al componente visual.</p>
+
+                    <h3>3. Interceptores HTTP (El Guardián Silencioso)</h3>
+                    <p>Para manejar tokens de autorización o capturar errores globales (como un error 500 del servidor externo), utilicé Interceptores. Un interceptor captura todas las peticiones salientes y respuestas entrantes en un solo archivo centralizado, evitando tener que escribir lógica de error en cada uno de los componentes.</p>
+
+                    <p>Aplicar estas tres prácticas separa a un programador amateur de un desarrollador verdaderamente profesional en Angular.</p>
+                `
+            }
+        };
+
+        /* LÓGICA DEL MENÚ MÓVIL AISLADO Y SÓLIDO */
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            
+            if(menu.classList.contains('opacity-0')) {
+                menu.classList.remove('opacity-0', 'pointer-events-none');
+                menu.classList.add('opacity-100', 'pointer-events-auto');
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.add('opacity-0', 'pointer-events-none');
+                menu.classList.remove('opacity-100', 'pointer-events-auto');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        /* AUTO-CIERRE EN PANTALLA GRANDE PARA EVITAR CONFLICTOS */
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.add('opacity-0', 'pointer-events-none');
+                menu.classList.remove('opacity-100', 'pointer-events-auto');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        function navigate(viewId) {
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-fadeIn');
+            });
+            
+            const target = document.getElementById(viewId);
+            target.classList.remove('hidden');
+            target.classList.add('animate-fadeIn');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            resetReveals();
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-primary');
+                btn.classList.add('text-gray-400');
+            });
+            if(event && event.target.classList.contains('nav-btn')) {
+                event.target.classList.remove('text-gray-400');
+                event.target.classList.add('text-primary');
+            }
+
+            if(viewId !== 'view-home') document.getElementById('typed-text').innerHTML = '';
+            else startTypewriter();
+        }
+
+        function openArticle(articleId) {
+            const article = blogData[articleId];
+            if(article) {
+                document.getElementById('article-title').innerText = article.title;
+                document.getElementById('article-meta').innerText = article.meta;
+                document.getElementById('article-content').innerHTML = article.content;
+                navigate('view-article');
+            }
+        }
+
+        let observer;
+        function setupObserver() {
+            observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting){
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.1 });
+        }
+        function resetReveals() {
+            if(observer) observer.disconnect();
+            setupObserver();
+            document.querySelectorAll('.page-view:not(.hidden) .reveal').forEach(el => {
+                el.classList.remove('active');
+                observer.observe(el);
+            });
+        }
+        document.addEventListener("DOMContentLoaded", resetReveals);
+
+        const textArray = ["Backend Developer.", "Full Stack Engineer.", "Arquitecto de Software."];
+        let textArrayIndex = 0, charIndex = 0, typingTimeout;
+
+        function type() {
+            const el = document.getElementById("typed-text");
+            if(!el) return;
+            if (charIndex < textArray[textArrayIndex].length) {
+                el.textContent += textArray[textArrayIndex].charAt(charIndex);
+                charIndex++;
+                typingTimeout = setTimeout(type, 80);
+            } else typingTimeout = setTimeout(erase, 2500);
+        }
+        function erase() {
+            const el = document.getElementById("typed-text");
+            if(!el) return;
+            if (charIndex > 0) {
+                el.textContent = textArray[textArrayIndex].substring(0, charIndex-1);
+                charIndex--;
+                typingTimeout = setTimeout(erase, 40);
+            } else {
+                textArrayIndex++;
+                if(textArrayIndex >= textArray.length) textArrayIndex = 0;
+                typingTimeout = setTimeout(type, 500);
+            }
+        }
+        function startTypewriter() {
+            clearTimeout(typingTimeout);
+            charIndex = 0; textArrayIndex = 0;
+            const el = document.getElementById("typed-text");
+            if(el) el.textContent = "";
+            setTimeout(type, 800);
+        }
+        document.addEventListener("DOMContentLoaded", startTypewriter);
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 20) nav.classList.add('shadow-lg', 'py-1');
+            else nav.classList.remove('shadow-lg', 'py-1');
+        });
+
+        const blob = document.getElementById("cursor-glow");
+        document.body.onpointermove = event => {
+            if(window.innerWidth > 768) {
+                blob.style.left = `${event.clientX}px`;
+                blob.style.top = `${event.clientY + window.scrollY}px`;
+            }
+        };
+    </script>
+</body>
+</html>
