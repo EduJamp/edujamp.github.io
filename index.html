@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edu Jampier | Software Engineer & Backend Developer</title>
+    <title>Portafolio</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- SCRIPT DE EMAILJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -39,7 +42,7 @@
         .reveal.active { opacity: 1; transform: translateY(0); }
         
         #cursor-glow {
-            position: absolute; width: 300px; height: 300px;
+            position: fixed; width: 300px; height: 300px;
             background: radial-gradient(circle, rgba(63,185,80,0.15) 0%, rgba(0,0,0,0) 70%);
             border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: -1;
             transition: top 0.1s ease-out, left 0.1s ease-out;
@@ -64,14 +67,13 @@
 
     <div id="cursor-glow"></div>
 
-    <!-- NAVEGACIÓN PC (Z-INDEX 50) -->
+    <!-- NAVEGACIÓN PC -->
     <nav class="fixed w-full z-50 bg-darkBg/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300" id="navbar">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
             <a href="#" onclick="navigate('view-home')" class="font-heading font-bold text-2xl text-white tracking-tighter">
                 Edu<span class="text-primary">Jamp</span>.
             </a>
             
-            <!-- Botón para ABRIR menú móvil -->
             <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden text-white text-2xl focus:outline-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
@@ -87,11 +89,8 @@
         </div>
     </nav>
 
-    <!-- MENÚ MÓVIL AISLADO (Z-INDEX 60, FONDO SÓLIDO FORZADO) -->
-    <!-- Solución al error: Ahora está completamente fuera de la etiqueta <nav> -->
+    <!-- MENÚ MÓVIL AISLADO -->
     <div id="mobile-menu" class="md:hidden fixed inset-0 flex flex-col items-center justify-center space-y-6 font-heading text-2xl font-bold opacity-0 pointer-events-none transition-opacity duration-300 z-[60] overflow-y-auto" style="background-color: #050505;">
-        
-        <!-- Botón para CERRAR menú móvil -->
         <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-white text-3xl focus:outline-none p-2">
             <i class="fa-solid fa-xmark"></i>
         </button>
@@ -342,13 +341,13 @@
                     </p>
                     
                     <div class="space-y-4 md:space-y-6">
-                        <a href="mailto:educaceresruiz@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-darkCard border border-white/5 hover:border-primary transition group">
+                        <a href="mailto:educaceresruiz2005@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-darkCard border border-white/5 hover:border-primary transition group">
                             <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition">
                                 <i class="fa-solid fa-envelope text-xl"></i>
                             </div>
                             <div>
                                 <p class="text-xs md:text-sm text-gray-500">Correo Electrónico</p>
-                                <p class="text-white text-sm md:text-base font-semibold">educaceresruiz@gmail.com</p>
+                                <p class="text-white text-sm md:text-base font-semibold">educaceresruiz2005@gmail.com</p>
                             </div>
                         </a>
                         
@@ -376,17 +375,21 @@
 
                 <div class="bg-darkCard border border-white/10 p-6 md:p-10 rounded-3xl reveal relative overflow-hidden">
                     <h3 class="text-2xl font-bold text-white mb-8 relative z-10">Envíame un mensaje</h3>
-                    <form class="space-y-5 relative z-10" onsubmit="event.preventDefault(); alert('¡Gracias por probar el formulario! Por el momento, usa mi correo electrónico o LinkedIn para contactarme de forma directa.');">
+                    
+                    <!-- FORMULARIO DE EMAILJS CONECTADO (TEMPLATE CORREGIDO) -->
+                    <form id="contact-form" class="space-y-5 relative z-10">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <input type="text" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Nombre completo" required>
-                            <input type="email" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Correo electrónico" required>
+                            <input type="text" name="user_name" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Nombre completo" required>
+                            <input type="email" name="user_email" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Correo electrónico" required>
                         </div>
-                        <input type="text" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Asunto (Ej. Oferta Laboral, Proyecto)" required>
-                        <textarea rows="5" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm resize-none transition" placeholder="Cuéntame sobre el proyecto o la vacante..." required></textarea>
-                        <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-lg hover:bg-primary hover:text-white transition duration-300">
+                        <input type="text" name="subject" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm transition" placeholder="Asunto (Ej. Oferta Laboral, Proyecto)" required>
+                        <textarea name="message" rows="5" class="w-full bg-darkBg border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary text-sm resize-none transition" placeholder="Cuéntame sobre el proyecto o la vacante..." required></textarea>
+                        
+                        <button type="submit" id="submit-btn" class="w-full bg-white text-black font-bold py-4 rounded-lg hover:bg-primary hover:text-white transition duration-300">
                             Enviar Mensaje <i class="fa-solid fa-paper-plane ml-2"></i>
                         </button>
                     </form>
+
                 </div>
             </div>
         </section>
@@ -401,6 +404,46 @@
 
     <!-- SCRIPT CORE -->
     <script>
+        // INYECCIÓN DE TUS CREDENCIALES EXACTAS
+        emailjs.init("iTK2WEindvrPVmRrI");
+
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = 'Enviando... <i class="fa-solid fa-circle-notch fa-spin ml-2"></i>';
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            // USANDO TU SERVICE ID Y EL TEMPLATE CORREGIDO
+            emailjs.sendForm('service_n6mpkv7', 'template_u7l8r14', this)
+                .then(() => {
+                    btn.innerHTML = '¡Enviado con éxito! <i class="fa-solid fa-check ml-2"></i>';
+                    btn.classList.replace('bg-white', 'bg-primary');
+                    btn.classList.replace('text-black', 'text-white');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('bg-primary', 'bg-white');
+                        btn.classList.replace('text-white', 'text-black');
+                        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        document.getElementById('contact-form').reset();
+                    }, 3500);
+                }, (error) => {
+                    console.log('Error de EmailJS:', error);
+                    btn.innerHTML = 'Error al enviar <i class="fa-solid fa-xmark ml-2"></i>';
+                    btn.classList.replace('bg-white', 'bg-red-500');
+                    btn.classList.replace('text-black', 'text-white');
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('bg-red-500', 'bg-white');
+                        btn.classList.replace('text-white', 'text-black');
+                        btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    }, 3500);
+                });
+        });
+
         const blogData = {
             'spring-boot': {
                 title: 'Arquitectura Limpia en Spring Boot: ¿Por dónde empezar?',
@@ -459,7 +502,6 @@ public class UserService {
             }
         };
 
-        /* LÓGICA DEL MENÚ MÓVIL AISLADO Y SÓLIDO */
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             
@@ -474,7 +516,6 @@ public class UserService {
             }
         }
 
-        /* AUTO-CIERRE EN PANTALLA GRANDE PARA EVITAR CONFLICTOS */
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) {
                 const menu = document.getElementById('mobile-menu');
@@ -581,11 +622,12 @@ public class UserService {
             else nav.classList.remove('shadow-lg', 'py-1');
         });
 
+        // CORRECCIÓN DE DISTORSIÓN: Coordenadas ajustadas al viewport (fixed) sin añadir el scroll
         const blob = document.getElementById("cursor-glow");
         document.body.onpointermove = event => {
             if(window.innerWidth > 768) {
                 blob.style.left = `${event.clientX}px`;
-                blob.style.top = `${event.clientY + window.scrollY}px`;
+                blob.style.top = `${event.clientY}px`;
             }
         };
     </script>
